@@ -127,7 +127,24 @@ export default function QuestionAnswerForm() {
 
         // Special handling for question 3 (fill-in-the-blank)
         if (question.id === 3) {
-          // ... (existing code for question 3)
+          const correctAnswers = ['30', '29', '28'];
+          const thirdBlankAnswers = ['trade winds', 'trades', 'trade'];
+
+          const userAnswers = answer.split(' ').map((word) => word.trim());
+          const firstBlankAnswer = userAnswers[userAnswers.length - 3]; // Assuming the first blank is the third last word
+          const secondBlankAnswer = userAnswers[userAnswers.length - 2]; // Assuming the second blank is the second last word
+          const thirdBlankAnswer = userAnswers[userAnswers.length - 1]; // Assuming the third blank is the last word
+
+          const firstBlankCorrect = correctAnswers.includes(firstBlankAnswer);
+          const secondBlankCorrect = secondBlankAnswer.toLowerCase() === 'high'; // Check for the second blank
+          const thirdBlankCorrect = thirdBlankAnswers.includes(thirdBlankAnswer.toLowerCase());
+
+          const totalMarks = (firstBlankCorrect ? 1 : 0) + (secondBlankCorrect ? 1 : 0) + (thirdBlankCorrect ? 1 : 0);
+          // Set the response based on totalMarks
+          setOpenAIResponses((prev) => ({
+            ...prev,
+            [id]: `Marks: ${totalMarks}\nFeedback: ${totalMarks === 3 ? 'Excellent work!' : 'Please review your answers.'}`
+          }));
         }
 
         let evaluationGuidelines = '';
