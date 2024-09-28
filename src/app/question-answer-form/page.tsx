@@ -106,6 +106,25 @@ export default function QuestionAnswerForm() {
     setAnswers((prev) => ({ ...prev, [id]: value }));
   }, []);
 
+  const validateAnswer = (answer: number) => {
+    // Accept 30 for the first answer, or 28 or 29
+    if (answer === 30 || answer === 28 || answer === 29) {
+      return true; // Valid answer
+    }
+    // Accept trades (you can define your trade logic here)
+    // Example: if answer is a trade, return true
+    if (isTrade(answer)) {
+      return true; // Valid trade
+    }
+    return false; // Invalid answer
+  };
+
+  const isTrade = (answer: number) => {
+    // Implement your trade logic here
+    // For example, check if the answer is a specific trade value
+    return false; // Placeholder
+  };
+
   const handleSubmit = useCallback(
     async (id: number) => {
       try {
@@ -210,15 +229,16 @@ Be specific in your feedback, referencing the actual content of the student's re
 
         const data = await response.json();
         setOpenAIResponses((prev) => ({ ...prev, [id]: data.evaluation }));
-      } catch (error: any) {
+      } catch (error: unknown) {
         console.error('Error submitting to OpenAI:', error);
+        const errorMessage = (error as Error).message || 'An error occurred';
         setOpenAIResponses((prev) => ({
           ...prev,
-          [id]: `An error occurred while evaluating your answer: ${error.message}`,
+          [id]: `An error occurred while evaluating your answer: ${errorMessage}`,
         }));
       }
     },
-    [answers, questions]
+    [answers]
   );
 
   return (

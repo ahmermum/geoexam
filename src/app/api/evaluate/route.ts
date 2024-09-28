@@ -26,9 +26,10 @@ export async function POST(request: Request) {
     const evaluation = completion.choices[0]?.message?.content?.trim() ?? '';
 
     return NextResponse.json({ evaluation });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error in OpenAI API call:', error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    const errorMessage = (error as Error).message || 'Unknown error';
+    return NextResponse.json({ error: errorMessage }, { status: 500 });
   }
 }
 
