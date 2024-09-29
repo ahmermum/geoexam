@@ -1,35 +1,38 @@
 // src/app/api/evaluate/route.ts
 
-import { NextResponse } from 'next/server';
 import OpenAI from 'openai';
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-export async function POST(request: Request) {
+export async function POST(req: Request) {
   try {
-    const { prompt } = await request.json();
+    const { prompt } = await req.json();
 
-    if (!prompt) {
-      return NextResponse.json({ error: 'Missing prompt' }, { status: 400 });
-    }
-
-    // Log the prompt on the server side
-    console.log('Prompt received by the server:', prompt);
+    console.log('Received prompt:', prompt); // Log the received prompt
 
     const completion = await openai.chat.completions.create({
-      model: "gpt-3.5-turbo",
+      model: "gpt-4o-mini",
       messages: [{ role: "user", content: prompt }],
+      max_tokens: 1000,
+      temperature: 0.7,
     });
 
-    const evaluation = completion.choices[0]?.message?.content?.trim() ?? '';
+    console.log('OpenAI response:', completion); // Log the full OpenAI response
 
-    return NextResponse.json({ evaluation });
-  } catch (error: unknown) {
-    console.error('Error in OpenAI API call:', error);
-    const errorMessage = (error as Error).message || 'Unknown error';
-    return NextResponse.json({ error: errorMessage }, { status: 500 });
+    const evaluation = completion.choices[0].message.content;
+
+    return new Response(JSON.stringify({ evaluation }), {
+      headers: { 'Content-Type': 'application/json' },
+    });
+  } catch (error) {
+    console.error('Error in /api/evaluate:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    return new Response(JSON.stringify({ error: 'Error processing request', details: errorMessage }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' },
+    });
   }
 }
 
