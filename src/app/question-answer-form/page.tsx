@@ -157,6 +157,7 @@ export default function QuestionAnswerForm() {
   const [openAIResponses, setOpenAIResponses] = useState<{ [key: number]: string }>({});
   const [isLoading, setIsLoading] = useState<{ [key: number]: boolean }>({});
 
+  
   const handleAnswerChange = useCallback((id: number, value: string) => {
     setAnswers((prev) => ({ ...prev, [id]: value }));
   }, []);
